@@ -54,3 +54,42 @@ exports.createCategory = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
+exports.updateCategory = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    const category = await Category.findById(req.params.id);
+    
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+
+    category.name = name || category.name;
+    category.description = description || category.description;
+    
+    if (req.file) {
+      category.imageUrl = `/uploads/${req.file.filename}`;
+    }
+
+    await category.save();
+    res.json(category);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+exports.deleteCategory = async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+    
+    await category.deleteOne();
+    res.json({ message: 'Category deleted' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};

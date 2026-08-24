@@ -6,5 +6,7 @@ const upload = require('../utils/multerConfig');
 router.get('/', categoryController.getAllCategories);
 router.get('/with-products', categoryController.getCategoriesWithProducts);
 router.post('/', upload.single('image'), categoryController.createCategory);
+router.put('/:id', upload.single('image'), categoryController.updateCategory);
+router.delete('/:id', categoryController.deleteCategory);
 
 module.exports = router;
