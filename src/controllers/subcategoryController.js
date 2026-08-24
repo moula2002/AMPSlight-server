@@ -20,9 +20,10 @@ exports.createSubcategory = async (req, res) => {
     
     let imageUrl = '', bannerImageUrl = '';
     
+    const toBase64 = (file) => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
     if (req.files) {
-      if (req.files.image) imageUrl = `/uploads/${req.files.image[0].filename}`;
-      if (req.files.banner) bannerImageUrl = `/uploads/${req.files.banner[0].filename}`;
+      if (req.files.image) imageUrl = toBase64(req.files.image[0]);
+      if (req.files.banner) bannerImageUrl = toBase64(req.files.banner[0]);
     }
 
     const subcategory = new Subcategory({
@@ -72,9 +73,10 @@ exports.updateSubcategory = async (req, res) => {
     subcategory.isFeatured = isFeatured !== undefined ? isFeatured === 'true' : subcategory.isFeatured;
     subcategory.status = status !== undefined ? status : subcategory.status;
     
+    const toBase64 = (file) => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
     if (req.files) {
-      if (req.files.image) subcategory.imageUrl = `/uploads/${req.files.image[0].filename}`;
-      if (req.files.banner) subcategory.bannerImageUrl = `/uploads/${req.files.banner[0].filename}`;
+      if (req.files.image) subcategory.imageUrl = toBase64(req.files.image[0]);
+      if (req.files.banner) subcategory.bannerImageUrl = toBase64(req.files.banner[0]);
     }
 
     await subcategory.save();

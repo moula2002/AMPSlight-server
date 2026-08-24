@@ -42,10 +42,11 @@ exports.createCategory = async (req, res) => {
     
     let imageUrl = '', bannerImageUrl = '', iconUrl = '';
     
+    const toBase64 = (file) => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
     if (req.files) {
-      if (req.files.image) imageUrl = `/uploads/${req.files.image[0].filename}`;
-      if (req.files.banner) bannerImageUrl = `/uploads/${req.files.banner[0].filename}`;
-      if (req.files.icon) iconUrl = `/uploads/${req.files.icon[0].filename}`;
+      if (req.files.image) imageUrl = toBase64(req.files.image[0]);
+      if (req.files.banner) bannerImageUrl = toBase64(req.files.banner[0]);
+      if (req.files.icon) iconUrl = toBase64(req.files.icon[0]);
     }
 
     const category = new Category({
@@ -93,10 +94,11 @@ exports.updateCategory = async (req, res) => {
     category.isFeatured = isFeatured !== undefined ? isFeatured === 'true' : category.isFeatured;
     category.status = status !== undefined ? status : category.status;
     
+    const toBase64 = (file) => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
     if (req.files) {
-      if (req.files.image) category.imageUrl = `/uploads/${req.files.image[0].filename}`;
-      if (req.files.banner) category.bannerImageUrl = `/uploads/${req.files.banner[0].filename}`;
-      if (req.files.icon) category.iconUrl = `/uploads/${req.files.icon[0].filename}`;
+      if (req.files.image) category.imageUrl = toBase64(req.files.image[0]);
+      if (req.files.banner) category.bannerImageUrl = toBase64(req.files.banner[0]);
+      if (req.files.icon) category.iconUrl = toBase64(req.files.icon[0]);
     }
 
     await category.save();

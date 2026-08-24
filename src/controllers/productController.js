@@ -38,13 +38,14 @@ exports.createProduct = async (req, res) => {
     let imageUrl = '', datasheetUrl = '', brochureUrl = '';
     let galleryImages = [];
     
+    const toBase64 = (file) => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
     if (req.files) {
-      if (req.files.mainImage) imageUrl = `/uploads/${req.files.mainImage[0].filename}`;
-      if (req.files.datasheet) datasheetUrl = `/uploads/${req.files.datasheet[0].filename}`;
-      if (req.files.brochure) brochureUrl = `/uploads/${req.files.brochure[0].filename}`;
+      if (req.files.mainImage) imageUrl = toBase64(req.files.mainImage[0]);
+      if (req.files.datasheet) datasheetUrl = toBase64(req.files.datasheet[0]);
+      if (req.files.brochure) brochureUrl = toBase64(req.files.brochure[0]);
       
       if (req.files.galleryImages) {
-        galleryImages = req.files.galleryImages.map(file => `/uploads/${file.filename}`);
+        galleryImages = req.files.galleryImages.map(file => toBase64(file));
       }
     }
 
@@ -124,16 +125,17 @@ exports.updateProduct = async (req, res) => {
     }
 
     // Files
+    const toBase64 = (file) => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
     if (req.files) {
-      if (req.files.mainImage) product.imageUrl = `/uploads/${req.files.mainImage[0].filename}`;
-      if (req.files.datasheet) product.datasheetUrl = `/uploads/${req.files.datasheet[0].filename}`;
-      if (req.files.brochure) product.brochureUrl = `/uploads/${req.files.brochure[0].filename}`;
+      if (req.files.mainImage) product.imageUrl = toBase64(req.files.mainImage[0]);
+      if (req.files.datasheet) product.datasheetUrl = toBase64(req.files.datasheet[0]);
+      if (req.files.brochure) product.brochureUrl = toBase64(req.files.brochure[0]);
       
       // If new gallery images are uploaded, append them (or replace, depending on logic. Here we replace for simplicity or you can append if you want).
       if (req.files.galleryImages) {
         // Here we just replace them. If we want to append, we would do:
-        // product.galleryImages = [...product.galleryImages, ...req.files.galleryImages.map(f => `/uploads/${f.filename}`)];
-        product.galleryImages = req.files.galleryImages.map(file => `/uploads/${file.filename}`);
+        // product.galleryImages = [...product.galleryImages, ...req.files.galleryImages.map(f => toBase64(f))];
+        product.galleryImages = req.files.galleryImages.map(file => toBase64(file));
       }
     }
 
