@@ -11,6 +11,7 @@ const productUploads = upload.fields([
 ]);
 
 router.get('/', productController.getAllProducts);
+router.get('/:id', productController.getProductById);
 router.post('/', productUploads, productController.createProduct);
 router.put('/:id', productUploads, productController.updateProduct);
 router.delete('/:id', productController.deleteProduct);
