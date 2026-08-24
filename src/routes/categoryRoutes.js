@@ -3,10 +3,16 @@ const router = express.Router();
 const categoryController = require('../controllers/categoryController');
 const upload = require('../utils/multerConfig');
 
+const categoryUploads = upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'banner', maxCount: 1 },
+  { name: 'icon', maxCount: 1 }
+]);
+
 router.get('/', categoryController.getAllCategories);
 router.get('/with-products', categoryController.getCategoriesWithProducts);
-router.post('/', upload.single('image'), categoryController.createCategory);
-router.put('/:id', upload.single('image'), categoryController.updateCategory);
+router.post('/', categoryUploads, categoryController.createCategory);
+router.put('/:id', categoryUploads, categoryController.updateCategory);
 router.delete('/:id', categoryController.deleteCategory);
 
 module.exports = router;

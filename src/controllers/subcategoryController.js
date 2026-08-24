@@ -1,8 +1,10 @@
 const Subcategory = require('../models/Subcategory');
 
+const slugify = (text) => text.toString().toLowerCase().trim().replace(/[\s\W-]+/g, '-');
+
 exports.getAllSubcategories = async (req, res) => {
   try {
-    const subcategories = await Subcategory.find().populate('category', 'name').sort({ createdAt: -1 });
+    const subcategories = await Subcategory.find().populate('category', 'name').sort({ displayOrder: 1, createdAt: -1 });
     res.json(subcategories);
   } catch (error) {
     console.error(error);
@@ -12,18 +14,30 @@ exports.getAllSubcategories = async (req, res) => {
 
 exports.createSubcategory = async (req, res) => {
   try {
-    const { name, description, category } = req.body;
-    let imageUrl = '';
+    const { name, description, category, metaTitle, metaDescription, metaKeywords, displayOrder, isFeatured, status } = req.body;
     
-    if (req.file) {
-      imageUrl = `/uploads/${req.file.filename}`;
+    const slug = slugify(name);
+    
+    let imageUrl = '', bannerImageUrl = '';
+    
+    if (req.files) {
+      if (req.files.image) imageUrl = `/uploads/${req.files.image[0].filename}`;
+      if (req.files.banner) bannerImageUrl = `/uploads/${req.files.banner[0].filename}`;
     }
 
     const subcategory = new Subcategory({
       name,
+      slug,
       description,
       category,
-      imageUrl
+      metaTitle,
+      metaDescription,
+      metaKeywords,
+      displayOrder: displayOrder || 0,
+      isFeatured: isFeatured === 'true',
+      status: status || 'Active',
+      imageUrl,
+      bannerImageUrl
     });
 
     await subcategory.save();
@@ -37,19 +51,30 @@ exports.createSubcategory = async (req, res) => {
 
 exports.updateSubcategory = async (req, res) => {
   try {
-    const { name, description, category } = req.body;
+    const { name, description, category, metaTitle, metaDescription, metaKeywords, displayOrder, isFeatured, status } = req.body;
     const subcategory = await Subcategory.findById(req.params.id);
     
     if (!subcategory) {
       return res.status(404).json({ message: 'Subcategory not found' });
     }
 
-    subcategory.name = name || subcategory.name;
-    subcategory.description = description || subcategory.description;
-    subcategory.category = category || subcategory.category;
+    if (name) {
+      subcategory.name = name;
+      subcategory.slug = slugify(name);
+    }
     
-    if (req.file) {
-      subcategory.imageUrl = `/uploads/${req.file.filename}`;
+    subcategory.description = description !== undefined ? description : subcategory.description;
+    subcategory.category = category !== undefined ? category : subcategory.category;
+    subcategory.metaTitle = metaTitle !== undefined ? metaTitle : subcategory.metaTitle;
+    subcategory.metaDescription = metaDescription !== undefined ? metaDescription : subcategory.metaDescription;
+    subcategory.metaKeywords = metaKeywords !== undefined ? metaKeywords : subcategory.metaKeywords;
+    subcategory.displayOrder = displayOrder !== undefined ? displayOrder : subcategory.displayOrder;
+    subcategory.isFeatured = isFeatured !== undefined ? isFeatured === 'true' : subcategory.isFeatured;
+    subcategory.status = status !== undefined ? status : subcategory.status;
+    
+    if (req.files) {
+      if (req.files.image) subcategory.imageUrl = `/uploads/${req.files.image[0].filename}`;
+      if (req.files.banner) subcategory.bannerImageUrl = `/uploads/${req.files.banner[0].filename}`;
     }
 
     await subcategory.save();
