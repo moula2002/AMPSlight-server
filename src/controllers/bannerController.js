@@ -1,6 +1,4 @@
 const Banner = require('../models/Banner');
-const fs = require('fs');
-const path = require('path');
 
 // Get all banners
 exports.getAllBanners = async (req, res) => {
@@ -21,7 +19,7 @@ exports.createBanner = async (req, res) => {
       return res.status(400).json({ message: 'Banner image is required' });
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const imageUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
 
     const banner = new Banner({
       title,
@@ -52,14 +50,7 @@ exports.updateBanner = async (req, res) => {
     if (isActive !== undefined) banner.isActive = isActive;
 
     if (req.file) {
-      // Remove old image if it exists
-      if (banner.imageUrl) {
-        const oldImagePath = path.join(__dirname, '..', '..', banner.imageUrl);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
-      }
-      banner.imageUrl = `/uploads/${req.file.filename}`;
+      banner.imageUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
 
     const updatedBanner = await banner.save();
@@ -74,14 +65,6 @@ exports.deleteBanner = async (req, res) => {
   try {
     const banner = await Banner.findById(req.params.id);
     if (!banner) return res.status(404).json({ message: 'Banner not found' });
-
-    // Remove image file
-    if (banner.imageUrl) {
-      const imagePath = path.join(__dirname, '..', '..', banner.imageUrl);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-    }
 
     await banner.deleteOne();
     res.json({ message: 'Banner deleted successfully' });
