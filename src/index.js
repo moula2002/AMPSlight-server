@@ -39,12 +39,14 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const subcategoryRoutes = require('./routes/subcategoryRoutes');
 const productRoutes = require('./routes/productRoutes');
 const statsRoutes = require('./routes/statsRoutes');
+const bannerRoutes = require('./routes/bannerRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/subcategories', subcategoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/banners', bannerRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {
