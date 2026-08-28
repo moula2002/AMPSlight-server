@@ -15,7 +15,7 @@ exports.createProject = async (req, res) => {
     let imageUrl = '';
     
     if (req.file) {
-      imageUrl = `/uploads/${req.file.filename}`;
+      imageUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
 
     const project = new Project({
@@ -52,17 +52,17 @@ exports.updateProject = async (req, res) => {
     
     if (!project) return res.status(404).json({ message: 'Project not found' });
 
-    project.title = title || project.title;
-    project.category = category || project.category;
-    project.location = location || project.location;
-    project.description = description || project.description;
+    if (title !== undefined) project.title = title;
+    if (category !== undefined) project.category = category;
+    if (location !== undefined) project.location = location;
+    if (description !== undefined) project.description = description;
     
     if (isActive !== undefined) {
       project.isActive = isActive;
     }
 
     if (req.file) {
-      project.imageUrl = `/uploads/${req.file.filename}`;
+      project.imageUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
 
     await project.save();
@@ -71,3 +71,4 @@ exports.updateProject = async (req, res) => {
     res.status(500).json({ message: 'Error updating project' });
   }
 };
+
