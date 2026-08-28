@@ -44,3 +44,30 @@ exports.deleteProject = async (req, res) => {
     res.status(500).json({ message: 'Error deleting project' });
   }
 };
+
+exports.updateProject = async (req, res) => {
+  try {
+    const { title, category, location, description, isActive } = req.body;
+    const project = await Project.findById(req.params.id);
+    
+    if (!project) return res.status(404).json({ message: 'Project not found' });
+
+    project.title = title || project.title;
+    project.category = category || project.category;
+    project.location = location || project.location;
+    project.description = description || project.description;
+    
+    if (isActive !== undefined) {
+      project.isActive = isActive;
+    }
+
+    if (req.file) {
+      project.imageUrl = `/uploads/${req.file.filename}`;
+    }
+
+    await project.save();
+    res.json(project);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating project' });
+  }
+};
